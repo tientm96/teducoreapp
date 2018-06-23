@@ -6,9 +6,11 @@ using TeduCoreApp.Infrastructure.SharedKernel;
 
 namespace TeduCoreApp.Data.Entities
 {
-    public class Tag : DomainEntity<string> //kế thừa lấy id, và id lúc này là string
-    {                               //nhưng ko thể cấu hình nó là varchar[n] hay nvarchar[n]
-                                    //Lúc này cần dùng đến TagConfiguration ở prj EF để cấu hình.
+    public class Tag : DomainEntity<string> //kế thừa id, và id lúc này là string
+    {   //nhưng ko thể cấu hình nó là varchar[n] hay nvarchar[n], vì ở đây ko gọi nó ra tr.tiep.
+              //Lúc này cần dùng đến TagConfiguration ở prj EF để cấu hình
+              //    để cho nó đúng 1 kiểu csdl là varchar khi gen ra trong csdl.
+
         [MaxLength(50)]
         [Required]
         public string Name { get; set; }

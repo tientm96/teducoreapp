@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 using TeduCoreApp.Data.Enums;
 using TeduCoreApp.Data.Interfaces;
 using TeduCoreApp.Infrastructure.SharedKernel;
@@ -10,11 +12,11 @@ namespace TeduCoreApp.Data.Entities
 {
     //gọi interface để lấy các thuộc tính dùng chung. Ở đây gán Id là int
 
-    [Table("Products")] //gen ra table Products
+    [Table("Products")]//gen ra table Products
     public class Product : DomainEntity<int>, ISwitchable, IDateTracking, IHasSeoMetaData
     {
         [StringLength(255)]
-        [Required] //cần thiết, ko đc null
+        [Required]  //cần thiết, ko đc null
         public string Name { get; set; }
 
         [Required]
@@ -50,10 +52,18 @@ namespace TeduCoreApp.Data.Entities
         [StringLength(255)]
         public string Unit { get; set; }
 
+
+
         //tạo khóa ngoại. virtual vì entity sử dụng cơ chế Lazy loading chỉ chạy khi có virtual.
+        //  foreignkey này đc tham chiếu từ ProductCategory,
+        //  nên phải qua ProductCategory xác nhận là có  tham chiếu.
         [ForeignKey("CategoryId")]
         public virtual ProductCategory ProductCategory { set; get; }
 
+
+
+
+        //implement from interface
         public string SeoPageTitle { set; get; }
 
         [Column(TypeName = "varchar")]

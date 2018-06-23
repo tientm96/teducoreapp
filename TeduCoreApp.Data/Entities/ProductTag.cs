@@ -8,7 +8,8 @@ using TeduCoreApp.Infrastructure.SharedKernel;
 namespace TeduCoreApp.Data.Entities
 {
     public class ProductTag : DomainEntity<int> //chỉ dùng chung 1 Id, Id kiểu int
-    {
+    {                     //không dùng các thuộc tính chung, nên ko kế thừa các Interface.
+
         public int ProductId { get; set; }
 
         //varchar[50] trong sql
@@ -20,6 +21,7 @@ namespace TeduCoreApp.Data.Entities
         [ForeignKey("ProductId")]
         public virtual Product Product { set; get; }
 
+        //tạo khóa ngoại
         [ForeignKey("TagId")]
         public virtual Tag Tag { set; get; }
     }
