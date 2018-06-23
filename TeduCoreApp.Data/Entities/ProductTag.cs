@@ -17,11 +17,13 @@ namespace TeduCoreApp.Data.Entities
         [Column(TypeName = "varchar")] //khẳng định nó là varchar. Nếu ko thì gen ra có thể là nvarchar
         public string TagId { set; get; }
 
-        //tạo khóa ngoại
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Product, 
+        //  nên phải qua Product xác nhận là có tham chiếu.
         [ForeignKey("ProductId")]
         public virtual Product Product { set; get; }
 
-        //tạo khóa ngoại
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Tag, 
+        //  nên phải qua Tag xác nhận là có tham chiếu.
         [ForeignKey("TagId")]
         public virtual Tag Tag { set; get; }
     }

@@ -18,5 +18,9 @@ namespace TeduCoreApp.Data.Entities
         [MaxLength(50)]
         [Required]
         public string Type { get; set; }
+
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductTag
+        public virtual ICollection<ProductTag> ProductTags { set; get; }
     }
 }

@@ -12,8 +12,12 @@ namespace TeduCoreApp.Data.Entities
     {
         public int ProductId { get; set; }
 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Product, 
+        //  nên phải qua Product xác nhận là có tham chiếu.
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; }
+
+
 
         [StringLength(250)]
         public string Path { get; set; }

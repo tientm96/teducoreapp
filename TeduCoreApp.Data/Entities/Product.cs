@@ -60,6 +60,23 @@ namespace TeduCoreApp.Data.Entities
         [ForeignKey("CategoryId")]
         public virtual ProductCategory ProductCategory { set; get; }
 
+        
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class BillDetail
+        public virtual ICollection<BillDetail> BillDetails { set; get; }
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductImage
+        public virtual ICollection<ProductImage> ProductImages { set; get; }
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductQuantity
+        public virtual ICollection<ProductQuantity> ProductQuantitys { set; get; }
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductTag
+        public virtual ICollection<ProductTag> ProductTags { set; get; }
+      
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductTag
+        public virtual ICollection<WholePrice> WholePrices { set; get; }
+
+
 
 
 

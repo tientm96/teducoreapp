@@ -20,6 +20,8 @@ namespace TeduCoreApp.Data.Entities
 
         public bool? HasRead { get; set; }
 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ AppUser, 
+        //  nên phải qua AppUser xác nhận là có tham chiếu.
         [ForeignKey("UserId")]
         public virtual AppUser AppUser { get; set; }
 

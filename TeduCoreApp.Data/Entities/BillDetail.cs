@@ -43,15 +43,24 @@ namespace TeduCoreApp.Data.Entities
 
         public int SizeId { get; set; }
 
+
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Bill, 
+        //  nên phải qua Bill xác nhận là có tham chiếu.
         [ForeignKey("BillId")]
         public virtual Bill Bill { set; get; }
 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Product, 
+        //  nên phải qua Product xác nhận là có tham chiếu.
         [ForeignKey("ProductId")]
         public virtual Product Product { set; get; }
 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Color, 
+        //  nên phải qua Color xác nhận là có tham chiếu.
         [ForeignKey("ColorId")]
         public virtual Color Color { set; get; }
 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Size, 
+        //  nên phải qua Size xác nhận là có tham chiếu.
         [ForeignKey("SizeId")]
         public virtual Size Size { set; get; }
     }

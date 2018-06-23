@@ -69,9 +69,13 @@ namespace TeduCoreApp.Data.Entities
         [StringLength(450)]
         public string CustomerId { set; get; }
 
+
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ AppUser, 
+        //  nên phải qua AppUser xác nhận là có tham chiếu.
         [ForeignKey("CustomerId")]
         public virtual AppUser User { set; get; }
 
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class BillDetail
         public virtual ICollection<BillDetail> BillDetails { set; get; }
     }
 }

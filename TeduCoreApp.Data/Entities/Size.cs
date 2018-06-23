@@ -16,5 +16,11 @@ namespace TeduCoreApp.Data.Entities
         {
             get; set;
         }
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class BillDetail
+        public virtual ICollection<BillDetail> BillDetails { set; get; }
+
+        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductQuantity
+        public virtual ICollection<ProductQuantity> ProductQuantitys { set; get; }
     }
 }

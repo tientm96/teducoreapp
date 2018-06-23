@@ -29,5 +29,18 @@ namespace TeduCoreApp.Data.Entities
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
         public Status Status { get; set; }
+
+
+
+        //--------------------tự thêm
+        //xác nhận khóa ngoại: xác nhận có foreignkey tham chiếu từ class NÀY, 
+        // đến class Announcement và table Announcements trong db.
+        public virtual ICollection<Announcement> Announcements { get; set; }
+
+        //xác nhận khóa ngoại tham chiếu đến class AnnouncementUser.
+        public virtual ICollection<AnnouncementUser> AnnouncementUsers { get; set; }
+
+        //xác nhận khóa ngoại tham chiếu đến class Bill.
+        public virtual ICollection<Bill> Bills { get; set; }
     }
 }
