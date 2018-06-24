@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TeduCoreApp.Data;
-using TeduCoreApp.Models;
-using TeduCoreApp.Services;
+using TeduCoreApp.Application.Implementation;
+using TeduCoreApp.Application.Interfaces;
 using TeduCoreApp.Data.EF;
+using TeduCoreApp.Data.EF.Repositories;
 using TeduCoreApp.Data.Entities;
+using TeduCoreApp.Data.IRepositories;
+using TeduCoreApp.Services;
 
 namespace TeduCoreApp
 {
     /*Cấu hình file statup, thay thế ApplicationDbContext mặc định thành AppDbContext của ta.
         Mục đích cấu hình để gen ra db đúng với custom của ta.
-    
+
         -Sau khi cấu hình xong thì ta xóa folder Data (trong pr MVC) đc gen mặc định từ trước, với
         ApplicationDbContext
      */
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -41,15 +41,12 @@ namespace TeduCoreApp
             //"DefaultConnection" lấy trong file appsetting.json, đã đc sửa lại.
             //add object o.MigrationsAssembly để tự động DbContext trong Assembly đấy.
 
-
-
             //cấu hình lại Identity
             services.AddIdentity<AppUser, AppRole>() //thay vì <ApplicationUser, IdentityRole>
                 .AddEntityFrameworkStores<AppDbContext>() //thay vì ApplicationDbContext
                 .AddDefaultTokenProviders();
 
-
-            // Add application services.
+            // Add application services.***
             services.AddTransient<IEmailSender, EmailSender>();
 
             //Nếu muốn tạo đc dữ liệu User và Role mẫu ở DbInitializer thì phải cấu hình ở đây.
@@ -57,8 +54,14 @@ namespace TeduCoreApp
             services.AddScoped<UserManager<AppUser>, UserManager<AppUser>>();
             services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
 
+            //Cấu hình cho AUTOMAPPER (Nhớ NuGet AutoMapper ở pr này trước khi cấu hình)
+            services.AddSingleton(Mapper.Configuration);    //ĐỂ auto trả về class AutoMapperConfig
+            services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
 
-
+            //Phần ProductCategoryService trong pr Application muốn tự động chạy thì phải
+            //  cấu hình trong file starup của pr MVC
+            services.AddTransient<IProductCategoryRepository, ProductCategoryRepository>();
+            services.AddTransient<IProductCategoryService, ProductCategoryService>();
 
             /*Class DbInitializer dùng để khởi tạo một số dlieu để làm việc khi khởi tạo db.
              * Chúng ta cấu hình class này tại đây.
@@ -68,8 +71,6 @@ namespace TeduCoreApp
              */
             //Add DbInitializer services
             services.AddTransient<DbInitializer>();
-
-
 
             services.AddMvc();
         }
@@ -101,8 +102,8 @@ namespace TeduCoreApp
 
             //gọi đến hàm Seed() để tạo dữ liệu
             dbInitializer.Seed().Wait();    //.Wait() gọi theo bất đồng bộ, nghĩa là đợi
-                           //vì bên method dbInitializer.Seed() cấu hình theo bất đồng bộ.
-                           //   Nghĩa là ĐỢI cho Task complete mới thực thi.
+                                            //vì bên method dbInitializer.Seed() cấu hình theo bất đồng bộ.
+                                            //   Nghĩa là ĐỢI cho Task complete mới thực thi.
         }
     }
 }
