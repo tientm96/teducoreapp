@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TeduCoreApp.Data.Entities;
 using TeduCoreApp.Data.Enums;
@@ -19,6 +18,7 @@ namespace TeduCoreApp.Data.EF
         private readonly AppDbContext _context;
         private UserManager<AppUser> _userManager;
         private RoleManager<AppRole> _roleManager;
+
         public DbInitializer(AppDbContext context, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
             _context = context;
@@ -26,13 +26,13 @@ namespace TeduCoreApp.Data.EF
             _roleManager = roleManager;
         }
 
-
         //seeding cho tất cả entity mình phải làm. Nghĩa là tạo một vài dữ liệu có sẵn cho nó,
         //  thay vì để entity tự gen ra những số liệu mã hóa.
 
-        //kiểu async: là kiểu bất đồng bộ, khi các cái khác chạy chưa xong thì nó vẫn chờ, 
+        //kiểu async: là kiểu bất đồng bộ, khi các cái khác chạy chưa xong thì nó vẫn chờ,
         //  nghĩa là ĐỢI cho Task complete mới thực thi.
         //  tìm hiểu cơ chế async, await của .net.
+
         public async Task Seed()
         {
             if (!_roleManager.Roles.Any())
@@ -56,7 +56,6 @@ namespace TeduCoreApp.Data.EF
                     Description = "Customer"
                 });
             }
-
             if (!_userManager.Users.Any())
             {
                 await _userManager.CreateAsync(new AppUser()
@@ -65,6 +64,9 @@ namespace TeduCoreApp.Data.EF
                     FullName = "Administrator",
                     Email = "admin@gmail.com",
                     Balance = 0,
+                    DateCreated = DateTime.Now,
+                    DateModified = DateTime.Now,
+                    Status = Status.Active
                 }, "123654$");
                 var user = await _userManager.FindByNameAsync("admin");
                 await _userManager.AddToRoleAsync(user, "Admin");
@@ -103,7 +105,6 @@ namespace TeduCoreApp.Data.EF
                 });
             }
 
-            //class CommonConstants ở folder Constants của pr Utilities.
             if (_context.Footers.Count(x => x.Id == CommonConstants.DefaultFooterId) == 0)
             {
                 string content = "Footer";
@@ -144,7 +145,6 @@ namespace TeduCoreApp.Data.EF
                         AdvertistmentPositions = new List<AdvertistmentPosition>(){
                         new AdvertistmentPosition(){Id="product-detail-left",Name="Bên trái"}
                     } },
-
                 };
                 _context.AdvertistmentPages.AddRange(pages);
             }

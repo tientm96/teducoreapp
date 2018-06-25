@@ -12,8 +12,10 @@ namespace TeduCoreApp.Data.EF.Configurations
     {
         public override void Configure(EntityTypeBuilder<ProductTag> entity)
         {
-            entity.Property(c => c.TagId).HasMaxLength(255).IsRequired()
-            .HasColumnType("varchar(255)");
+            //c trỏ tới TagId, chứ ko phải Id của ProductTag(đã là int, ko cần phải
+            //      configuration)
+            entity.Property(c => c.TagId).HasMaxLength(50).IsRequired()
+            .HasColumnType("varchar(50)");
             // etc.
         }
     }

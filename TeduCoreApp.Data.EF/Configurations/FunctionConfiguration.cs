@@ -16,6 +16,10 @@ namespace TeduCoreApp.Data.EF.Configurations
             entity.Property(c => c.Id).IsRequired()
             .HasColumnType("varchar(128)");
             // etc.
+
+            //entity.Property(c => c.Id).HasMaxLength(128)
+            //    .IsRequired().HasColumnType("varchar(128)");//Cấu hình để Id của Function có kdl varchar(128)
+                                                           //=true: ko đc null                         
         }
     }
 }

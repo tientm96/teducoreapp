@@ -20,6 +20,7 @@ namespace TeduCoreApp.Data.Entities
         [Required]
         public string Alias { set; get; }
 
+        //implement
         public string Content { set; get; }
         public Status Status { set; get; }
     }

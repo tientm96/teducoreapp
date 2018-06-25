@@ -8,9 +8,10 @@ namespace TeduCoreApp.Data.EF.Extensions
 {
     //Extension method: xem lý thuyết trong csdl.
     //  là class add thêm method cho class khác. phải có static ở class này và method add.
+
     public static class ModelBuilderExtensions
     {
-        public static void AddConfiguration<TEntity>(   //AddConfiguration: là method add thêm cho class ModelBuilder.
+        public static void AddConfiguration<TEntity>(//AddConfiguration: là method add thêm cho class ModelBuilder.
           this ModelBuilder modelBuilder,//ModelBuilder,DbEntityConfiguration: là các class đc add thêm method AddConfiguration.
           DbEntityConfiguration<TEntity> entityConfiguration) where TEntity : class
         {

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace TeduCoreApp.Data.Entities
 {
@@ -15,7 +14,6 @@ namespace TeduCoreApp.Data.Entities
 
         public AppRole() : base()
         {
-
         }
 
         //thêm constructor mới, có description
@@ -24,8 +22,13 @@ namespace TeduCoreApp.Data.Entities
             this.Description = description;
         }
 
-        //thêm 4 thuộc tính cho user mà chúng ta nghĩ nó cần thiết
+        //thêm thuộc tính để thêm constructor mới
         [StringLength(250)]
         public string Description { get; set; }
+
+
+        //----------------------tự thêm
+        //xác nhận khóa ngoại tham chiếu đến class Permission.
+        public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

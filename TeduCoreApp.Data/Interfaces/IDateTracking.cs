@@ -9,6 +9,7 @@ namespace TeduCoreApp.Data.Interfaces
     public interface IDateTracking
     {
         //interface ko dùng tiền tố
+
         DateTime DateCreated { set; get; }
 
         DateTime DateModified { set; get; }

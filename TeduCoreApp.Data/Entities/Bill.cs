@@ -12,10 +12,12 @@ namespace TeduCoreApp.Data.Entities
     [Table("Bills")]
     public class Bill : DomainEntity<int>, ISwitchable, IDateTracking
     {
-        public Bill() { }
+        public Bill()
+        {
+        }
 
         public Bill(string customerName, string customerAddress, string customerMobile, string customerMessage,
-            BillStatus billStatus, PaymentMethod paymentMethod, Status status, string customerId)
+            BillStatus billStatus, PaymentMethod paymentMethod, Status status, Guid customerId)
         {
             CustomerName = customerName;
             CustomerAddress = customerAddress;
@@ -28,7 +30,7 @@ namespace TeduCoreApp.Data.Entities
         }
 
         public Bill(int id, string customerName, string customerAddress, string customerMobile, string customerMessage,
-           BillStatus billStatus, PaymentMethod paymentMethod, Status status, string customerId)
+           BillStatus billStatus, PaymentMethod paymentMethod, Status status, Guid customerId)
         {
             Id = id;
             CustomerName = customerName;
@@ -40,6 +42,7 @@ namespace TeduCoreApp.Data.Entities
             Status = status;
             CustomerId = customerId;
         }
+
         [Required]
         [MaxLength(256)]
         public string CustomerName { set; get; }
@@ -66,14 +69,16 @@ namespace TeduCoreApp.Data.Entities
         [DefaultValue(Status.Active)]
         public Status Status { set; get; } = Status.Active;
 
-        [StringLength(450)]
-        public string CustomerId { set; get; }
+        //Vì đến AppUser, sd Identity nên dùng Guid để Identity tự lo độ dài.
+        //  ko cần [Required], [StringLength(250)], [Column(TypeName = "varchar(250)")].
+        //Như vậy ko cần phải có AppUserConfiguration như các class khác.
+        public Guid CustomerId { set; get; }//customerId ở đây đóng vai trò UserId
 
 
-        //tạo khóa ngoại: foreignkey này đc tham chiếu từ AppUser, 
+        //tạo khóa ngoại: foreignkey này đc tham chiếu từ AppUser,
         //  nên phải qua AppUser xác nhận là có tham chiếu.
         [ForeignKey("CustomerId")]
-        public virtual AppUser User { set; get; }
+        public virtual AppUser AppUser { set; get; }
 
         //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class BillDetail
         public virtual ICollection<BillDetail> BillDetails { set; get; }

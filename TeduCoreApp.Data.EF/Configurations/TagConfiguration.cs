@@ -18,14 +18,16 @@ namespace TeduCoreApp.Data.EF.Configurations
     /// 
     /// Các Configuration này sẽ auto config khi ta gọi nó trong dbContext.
     /// </summary>
+    /// 
+
     public class TagConfiguration : DbEntityConfiguration<Tag>
     {
         public override void Configure(EntityTypeBuilder<Tag> entity)
         {
             entity.Property(c => c.Id).HasMaxLength(50)
-                .IsRequired().HasColumnType("varchar(50)"); //Cấu hình để Id của Tag có kdl 
+                .IsRequired().HasColumnType("varchar(50)");//Cấu hình để Id của Tag có kdl 
               //=true: ko đc null                         //varchar(50)
-                                    
         }
     }
+
 }

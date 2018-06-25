@@ -14,9 +14,9 @@ namespace TeduCoreApp.Data.Entities
     {
         public Function()
         {
-
         }
-        public Function(string name, string url, string parentId, string iconCss, int sortOrder)
+
+        public Function(string name,string url,string parentId,string iconCss,int sortOrder)
         {
             this.Name = name;
             this.URL = url;
@@ -40,5 +40,12 @@ namespace TeduCoreApp.Data.Entities
         public string IconCss { get; set; }
         public int SortOrder { set; get; }
         public Status Status { set; get; }
+
+
+
+        //---------------------tự thêm
+        //xác nhận khóa ngoại tham chiếu đến class Permission.
+        public virtual ICollection<Permission> Permissions { get; set; }
+
     }
 }

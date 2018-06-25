@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TeduCoreApp.Application.Interfaces;
 using TeduCoreApp.Application.ViewModels.Product;
 using TeduCoreApp.Data.Entities;
@@ -13,10 +12,10 @@ using TeduCoreApp.Infrastructure.Interfaces;
 
 namespace TeduCoreApp.Application.Implementation
 {
+    //tên trường cần dấu _, còn tên biến thì ko
+
     public class ProductCategoryService : IProductCategoryService
     {
-        //tên trường cần dấu _, còn tên biến thì ko
-
         private IProductCategoryRepository _productCategoryRepository;
         private IUnitOfWork _unitOfWork;
 
@@ -33,7 +32,6 @@ namespace TeduCoreApp.Application.Implementation
             var productCategory = Mapper.Map<ProductCategoryViewModel, ProductCategory>(productCategoryVm);
             _productCategoryRepository.Add(productCategory);
             return productCategoryVm;
-
         }
 
         public void Delete(int id)

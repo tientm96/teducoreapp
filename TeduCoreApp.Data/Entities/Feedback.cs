@@ -10,7 +10,7 @@ using TeduCoreApp.Infrastructure.SharedKernel;
 namespace TeduCoreApp.Data.Entities
 {
     [Table("Feedbacks")]
-    public class Feedback : DomainEntity<int>, ISwitchable, IDateTracking
+    public class Feedback : DomainEntity<int>,ISwitchable, IDateTracking
     {
 
         [StringLength(250)]

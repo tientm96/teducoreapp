@@ -9,7 +9,7 @@ using TeduCoreApp.Infrastructure.SharedKernel;
 namespace TeduCoreApp.Data.EF
 {
     public class EFRepository<T, K> : IRepository<T, K>, IDisposable where T : DomainEntity<K>
-        //Entity T kế thừa từ DomainEntity với key=K. Suy ra những class nào kế thừa từ 
+        //Entity T kế thừa từ DomainEntity với key=K. Suy ra những class nào kế thừa từ
         //  DomainEntity thì đẩy vào đây đc.
     {
         private readonly AppDbContext _context;

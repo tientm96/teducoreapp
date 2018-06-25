@@ -12,7 +12,7 @@ namespace TeduCoreApp.Data.Entities
     public class Blog : DomainEntity<int>, ISwitchable, IDateTracking, IHasSeoMetaData
     {
         public Blog() { }
-        public Blog(string name, string thumbnailImage,
+        public Blog(string name,string thumbnailImage,
            string description, string content, bool? homeFlag, bool? hotFlag,
            string tags, Status status, string seoPageTitle,
            string seoAlias, string seoMetaKeyword,
@@ -32,7 +32,7 @@ namespace TeduCoreApp.Data.Entities
             SeoDescription = seoMetaDescription;
         }
 
-        public Blog(int id, string name, string thumbnailImage,
+        public Blog(int id, string name,string thumbnailImage,
              string description, string content, bool? homeFlag, bool? hotFlag,
              string tags, Status status, string seoPageTitle,
              string seoAlias, string seoMetaKeyword,
@@ -71,7 +71,11 @@ namespace TeduCoreApp.Data.Entities
 
         public string Tags { get; set; }
 
+
+        //Xác nhận khóa ngoại tham chiếu từ lớp này đến class BlogTag
         public virtual ICollection<BlogTag> BlogTags { set; get; }
+
+
         public DateTime DateCreated { set; get; }
         public DateTime DateModified { set; get; }
         public Status Status { set; get; }

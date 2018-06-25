@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using TeduCoreApp.Data.Interfaces;
-using TeduCoreApp.Data.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
+using TeduCoreApp.Data.Enums;
+using TeduCoreApp.Data.Interfaces;
 
 namespace TeduCoreApp.Data.Entities
 {
@@ -16,6 +15,7 @@ namespace TeduCoreApp.Data.Entities
         //vậy nên phải Nuget: 	Microsoft.AspNetCore.Identity.EntityFrameworkCore
 
         //thêm 4 thuộc tính cho user mà chúng ta nghĩ nó cần thiết
+
         public string FullName { get; set; }
 
         public DateTime? BirthDay { set; get; }
@@ -24,16 +24,14 @@ namespace TeduCoreApp.Data.Entities
 
         public string Avatar { get; set; }
 
-
         //implement method from Interface
         public DateTime DateCreated { get; set; }
+
         public DateTime DateModified { get; set; }
         public Status Status { get; set; }
 
-
-
         //--------------------tự thêm
-        //xác nhận khóa ngoại: xác nhận có foreignkey tham chiếu từ class NÀY, 
+        //xác nhận khóa ngoại: xác nhận có foreignkey tham chiếu từ class NÀY,
         // đến class Announcement và table Announcements trong db.
         public virtual ICollection<Announcement> Announcements { get; set; }
 

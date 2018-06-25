@@ -8,5 +8,6 @@ namespace TeduCoreApp.Data.Interfaces
     {
         T OwnerId { set; get; }
 
+
     }
 }

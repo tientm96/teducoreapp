@@ -2,15 +2,15 @@
 {
     //Vì dùng chung cho all, nên dùng abstract class để kế thừa cho dễ.
     //  thực thi Id sẵn luôn, ko cần phải ghi đè như interface.
-
     public abstract class DomainEntity<T>
     {
         //Phần nào chung thì đặt vào 1 file chung, phần nào riêng thì đặt vào từng file db riêng.
 
         //Đây là class base dùng để kế thừa lại trong tất cả các class Entity. 
-        //Class này chứa các thuộc tính dùng chung.
+        //Class này chứa thuộc tính Id dùng chung.
 
         //vì class dùng chung nên phải public
+
         public T Id { get; set; }
 
         /// <summary>

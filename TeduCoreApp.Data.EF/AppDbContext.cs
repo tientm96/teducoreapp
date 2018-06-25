@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using TeduCoreApp.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using TeduCoreApp.Data.EF.Extensions;
-using TeduCoreApp.Data.EF.Configurations;
-using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
+using System.Linq;
+using TeduCoreApp.Data.EF.Configurations;
+using TeduCoreApp.Data.EF.Extensions;
+using TeduCoreApp.Data.Entities;
 using TeduCoreApp.Data.Interfaces;
 
 namespace TeduCoreApp.Data.EF
 {
     //Thay vì IdentityDbContext<IdentityUser, IdentityRole> thì ta gọi class kế thừa của nó và
-    //đã đc mở rộng là AppUse và AppRole. Như vậy sẽ có nhiều thuộc tính hơn. 
+    //đã đc mở rộng là AppUse và AppRole. Như vậy sẽ có nhiều thuộc tính hơn.
 
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
@@ -24,7 +25,6 @@ namespace TeduCoreApp.Data.EF
 
         //Khai báo DbSet cho tất cả các table. Khai báo trong này thì nó mới gen ra table đc.
         //  truy cập dl thông qua thuộc tính Languages đến table Language
-
 
         public DbSet<Language> Languages { set; get; }
         public DbSet<SystemConfig> SystemConfigs { get; set; }
@@ -65,37 +65,46 @@ namespace TeduCoreApp.Data.EF
         protected override void OnModelCreating(ModelBuilder builder)
         {
             #region Identity Config
+
             //các config lẻ
-            //Đổi các tên mặc định trong Identity: UserClaim hoặc RoleClaim 
-            // sẽ đổi tên thành AppUserClaims AppRoleClaims để đồng bộ với AppUser, AppRole của mình.
+            //Đổi các tên mặc định trong Identity: UserClaim hoặc RoleClaim
+            // sẽ đổi tên thành AppUserClaims AppRoleClaims để đồng bộ với AppUser, AppRole của mình, 
+            //      tránh tạo ra các table mặc định của Identity, làm dư thừa.
+            //Tất cả đều phải Guid mới đúng chuẩn Identity.
+            builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims").HasKey(x => x.Id);
 
-            builder.Entity<IdentityUserClaim<string>>().ToTable("AppUserClaims").HasKey(x => x.Id);
-
-            builder.Entity<IdentityRoleClaim<string>>().ToTable("AppRoleClaims")
+            builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaims")
                 .HasKey(x => x.Id);
 
-            builder.Entity<IdentityUserLogin<string>>().ToTable("AppUserLogins").HasKey(x => x.UserId);
+            builder.Entity<IdentityUserLogin<Guid>>().ToTable("AppUserLogins").HasKey(x => x.UserId);
 
-            builder.Entity<IdentityUserRole<string>>().ToTable("AppUserRoles")
+            builder.Entity<IdentityUserRole<Guid>>().ToTable("AppUserRoles")
                 .HasKey(x => new { x.RoleId, x.UserId });
 
-            builder.Entity<IdentityUserToken<string>>().ToTable("AppUserTokens")
+            builder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserTokens")
                .HasKey(x => new { x.UserId });
 
             #endregion Identity Config
 
             //Các config cần gọi
-            builder.AddConfiguration(new TagConfiguration());
+            builder.AddConfiguration(new AdvertistmentPageConfiguration());
+            builder.AddConfiguration(new AdvertistmentPositionConfiguration());
+            builder.AddConfiguration(new AnnouncementConfiguration());
             builder.AddConfiguration(new BlogTagConfiguration());
             builder.AddConfiguration(new ContactDetailConfiguration());
             builder.AddConfiguration(new FooterConfiguration());
+            builder.AddConfiguration(new FunctionConfiguration());
             builder.AddConfiguration(new PageConfiguration());
-            builder.AddConfiguration(new FooterConfiguration());
             builder.AddConfiguration(new ProductTagConfiguration());
             builder.AddConfiguration(new SystemConfigConfiguration());
-            builder.AddConfiguration(new AdvertistmentPositionConfiguration());
+            builder.AddConfiguration(new TagConfiguration());
 
-            base.OnModelCreating(builder);
+
+
+            //Creating sẽ create theo mặc định, ngoài những cái ta cấu hình thì nó sẽ tự thêm
+            //  một số thành phần, nên bỏ nó đi.
+
+            //base.OnModelCreating(builder);
         }
 
         //Ghi đè. Viết ở dạng kế thừa, ta đc tự động tất cả khi set entity vào đấy.
@@ -108,14 +117,14 @@ namespace TeduCoreApp.Data.EF
             //lấy ra những thằng nào bị modified thì lấy ra 1 tập, rồi foeach nó
             var modified = ChangeTracker.Entries().Where(e => e.State == EntityState.Modified || e.State == EntityState.Added);
 
-            foreach(EntityEntry item in modified)
+            foreach (EntityEntry item in modified)
             {
                 var changedOrAddedItem = item.Entity as IDateTracking;
 
                 //nếu nó thuộc kiểu IDateTracking
                 if (changedOrAddedItem != null)
                 {
-                    if(item.State == EntityState.Added)
+                    if (item.State == EntityState.Added)
                     {
                         changedOrAddedItem.DateCreated = DateTime.Now;
                     }
@@ -123,6 +132,22 @@ namespace TeduCoreApp.Data.EF
                 }
             }
             return base.SaveChanges();
+        }
+    }
+
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+    {
+        public AppDbContext CreateDbContext(string[] args)
+        {
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json").Build();
+            var builder = new DbContextOptionsBuilder<AppDbContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            builder.UseSqlServer(connectionString);
+            return new AppDbContext(builder.Options);
+
+            //phương thức này khởi tạo ra dbcontext, để nó created khi ta dùng lệnh migration.
         }
     }
 }
