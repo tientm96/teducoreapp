@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,8 @@ namespace Microsoft.AspNetCore.Mvc
 {
     public static class UrlHelperExtensions
     {
-        public static string EmailConfirmationLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
+        //Vì dùng theo AppUser, chứ ko phải  ApplicationUser, nên phải sửa kdl userId thành Guid thay vì string
+        public static string EmailConfirmationLink(this IUrlHelper urlHelper, Guid userId, string code, string scheme)
         {
             return urlHelper.Action(
                 action: nameof(AccountController.ConfirmEmail),
@@ -17,7 +18,9 @@ namespace Microsoft.AspNetCore.Mvc
                 protocol: scheme);
         }
 
-        public static string ResetPasswordCallbackLink(this IUrlHelper urlHelper, string userId, string code, string scheme)
+
+        //Vì dùng theo AppUser, chứ ko phải  ApplicationUser, nên phải sửa kdl userId thành Guid thay vì string
+        public static string ResetPasswordCallbackLink(this IUrlHelper urlHelper, Guid userId, string code, string scheme)
         {
             return urlHelper.Action(
                 action: nameof(AccountController.ResetPassword),

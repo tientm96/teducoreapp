@@ -130,6 +130,13 @@ namespace TeduCoreApp
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
+                //Vì tự cấu hình Area nên phải qua starup này cấu hình 
+                //  đường dẫn MẶC ĐỊNH cho area
+                routes.MapRoute(
+                    name: "areaRoute",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                //area: tên area đó  |  contrll mđ là Home  | Act mđ Index  | id dấu ? =  null Able.
             });
 
 

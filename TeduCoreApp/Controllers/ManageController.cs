@@ -123,7 +123,9 @@ namespace TeduCoreApp.Controllers
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.EmailConfirmationLink(user.Id.ToString(), code, Request.Scheme);
+            var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+            //Vì dùng theo AppUser, chứ ko phải  ApplicationUser, nên phải sửa kdl userId thành Guid thay vì string
+            //  Kích vào method Email...này trong rồi sửa tham số UserId của nó thành Guid.
 
             var email = user.Email;
             await _emailSender.SendEmailConfirmationAsync(email, callbackUrl);
@@ -269,6 +271,8 @@ namespace TeduCoreApp.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            //Kích vào xem thì method này là có sẵn của identity, ko sửa tham số thành Guid đc,
+            //  vậy nên ở đây sẽ ToString() cho đúng với kiểu của nó.
             var info = await _signInManager.GetExternalLoginInfoAsync(user.Id.ToString());
 
             if (info == null)
