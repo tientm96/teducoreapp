@@ -25,7 +25,7 @@ namespace TeduCoreApp
         Mục đích cấu hình để gen ra db đúng với custom của ta.
 
         -Sau khi cấu hình xong thì ta xóa folder Data (trong pr MVC) đc gen mặc định từ trước, với
-        ApplicationDbContext
+        ApplicationDbContext.
      */
 
     public class Startup

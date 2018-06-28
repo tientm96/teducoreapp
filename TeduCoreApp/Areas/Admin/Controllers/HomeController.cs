@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 /*
 -Tạo kiến trúc area(trong core ko có sẵn như mvc5, phải tự tạo kiến trúc)
@@ -10,24 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 +bên trong folder Areas tạo folder Admin
 +trong fd Admin tự tạo tổ hợp MVC bằng các folder.
 
-+**Tạo controller Home chẳng hạn. Nhưng phải cấu hình area cho nó bằng cách 
++**Tạo controller Home chẳng hạn. Nhưng phải cấu hình area cho nó bằng cách
     thêm [Area("Admin")] vào đầu controller đó.
-+**Sau đó vào file Startup cấu hình phần UseMVC ở dưới cùng, 
++**Sau đó vào file Startup cấu hình phần UseMVC ở dưới cùng,
     để cấu hình đường dẫn mặc định cho are Admin.
-+Kích phải vào index để add view, view index sẽ tự động đc tạo trong 
++Kích phải vào index để add view, view index sẽ tự động đc tạo trong
     folder view của Admin.
 
--Gọi đến Admin: // GET: /Admin/Home/Index hoặc chỉ /Admin là nó tự tới 
+-Gọi đến Admin: // GET: /Admin/Home/Index hoặc chỉ /Admin là nó tự tới
     Index của Home vì đã cài mặc định
 
  */
 
-
-
 namespace TeduCoreApp.Areas.Controllers
 {
     [Area("Admin")] //cấu hình controller thuộc Area Admin
-    //Sau đó vào file Startup cấu hình phần UseMVC ở dưới cùng, để cấu hình 
+    //Sau đó vào file Startup cấu hình phần UseMVC ở dưới cùng, để cấu hình
     // đường dẫn mặc định cho Admin.
     public class HomeController : Controller
     {
