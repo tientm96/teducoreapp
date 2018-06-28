@@ -18,6 +18,7 @@
     <link href="~/lib/nprogress/nprogress.css" rel="stylesheet" />
     <!-- bootstrap-daterangepicker -->
     <link href="~/lib/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet" />
+    <link href="~/lib/notifyjs/dist/styles/metro/notify-metro.css" rel="stylesheet" />
     
     <!-- Custom Theme Style: kéo từ adminside-css-custom.css .
          2 folder css và js copy từ: \lib\gentelella\build -->
@@ -290,10 +291,10 @@
             <!-- /top navigation -->
             <!-- page content -->
             <!-- RenderBody(): có nghĩa là những trang nào sd trang này, thì
-    nội dung của những trang đó sẽ nằm ở vị trí RenderBody() này.
+            nội dung của những trang đó sẽ nằm ở vị trí RenderBody() này.
 
-            Nghĩa là phần này là phần khung, luôn có, còn phần RenderBody() là
-                những phần con ở trong, sẽ thay đổi theo từng trang.-->
+                    Nghĩa là phần này là phần khung, luôn có, còn phần RenderBody() là
+                        những phần con ở trong, sẽ thay đổi theo từng trang.-->
             <div class="right_col" role="main">
                 <div class="">
                     @RenderBody()
@@ -343,6 +344,11 @@
     <!-- bootstrap-daterangepicker -->
     <script src="~/lib/moment/moment.js"></script>
     <script src="~/lib/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/lib/notifyjs/dist/notify.js"></script>
+    <script src="~/lib/notifyjs/dist/styles/metro/notify-metro.js"></script>
+    <script src="~/lib/bootbox/bootbox.js"></script>
+
+    <script src="~/app/shared/tedu.js"></script>
 
     <!-- Custom Theme Scripts. 2 folder css và js copy từ: \lib\gentelella\build -->
     <script src="~/admin-side/js/custom.js"></script>
