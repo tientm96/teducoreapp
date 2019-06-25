@@ -1,2 +1,2 @@
 # teducoreapp
-Core App for Learning .NET Core
+Tedu Core App For Course TEDU-17

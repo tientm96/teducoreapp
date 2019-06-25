@@ -11,7 +11,7 @@ namespace TeduCoreApp.Data.EF
         public EFUnitOfWork(AppDbContext context)
         {
             _context = context;
-        } 
+        }
         public void Commit()
         {
             _context.SaveChanges();

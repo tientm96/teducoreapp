@@ -71,11 +71,7 @@ namespace TeduCoreApp.Data.Entities
 
         public string Tags { get; set; }
 
-
-        //Xác nhận khóa ngoại tham chiếu từ lớp này đến class BlogTag
         public virtual ICollection<BlogTag> BlogTags { set; get; }
-
-
         public DateTime DateCreated { set; get; }
         public DateTime DateModified { set; get; }
         public Status Status { set; get; }

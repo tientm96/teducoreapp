@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using TeduCoreApp.Infrastructure.Interfaces;
 using TeduCoreApp.Infrastructure.SharedKernel;
 
 namespace TeduCoreApp.Data.EF
 {
     public class EFRepository<T, K> : IRepository<T, K>, IDisposable where T : DomainEntity<K>
-        //Entity T kế thừa từ DomainEntity với key=K. Suy ra những class nào kế thừa từ
-        //  DomainEntity thì đẩy vào đây đc.
     {
         private readonly AppDbContext _context;
 
@@ -18,7 +17,6 @@ namespace TeduCoreApp.Data.EF
         {
             _context = context;
         }
-
         public void Add(T entity)
         {
             _context.Add(entity);
@@ -26,7 +24,7 @@ namespace TeduCoreApp.Data.EF
 
         public void Dispose()
         {
-            if (_context != null)
+          if(_context != null)
             {
                 _context.Dispose();
             }
@@ -75,7 +73,8 @@ namespace TeduCoreApp.Data.EF
 
         public void Remove(K id)
         {
-            Remove(FindById(id));
+            var entity = FindById(id);
+            Remove(entity);
         }
 
         public void RemoveMultiple(List<T> entities)

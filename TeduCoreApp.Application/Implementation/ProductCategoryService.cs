@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TeduCoreApp.Application.Interfaces;
 using TeduCoreApp.Application.ViewModels.Product;
 using TeduCoreApp.Data.Entities;
@@ -12,8 +13,6 @@ using TeduCoreApp.Infrastructure.Interfaces;
 
 namespace TeduCoreApp.Application.Implementation
 {
-    //tên trường cần dấu _, còn tên biến thì ko
-
     public class ProductCategoryService : IProductCategoryService
     {
         private IProductCategoryRepository _productCategoryRepository;
@@ -28,10 +27,10 @@ namespace TeduCoreApp.Application.Implementation
 
         public ProductCategoryViewModel Add(ProductCategoryViewModel productCategoryVm)
         {
-            //map ngược lại từ ProductCategoryViewModel sang ProductCategory
             var productCategory = Mapper.Map<ProductCategoryViewModel, ProductCategory>(productCategoryVm);
             _productCategoryRepository.Add(productCategory);
             return productCategoryVm;
+
         }
 
         public void Delete(int id)
@@ -91,7 +90,14 @@ namespace TeduCoreApp.Application.Implementation
 
         public void ReOrder(int sourceId, int targetId)
         {
-            throw new NotImplementedException();
+            var source = _productCategoryRepository.FindById(sourceId);
+            var target = _productCategoryRepository.FindById(targetId);
+            int tempOrder = source.SortOrder;
+            source.SortOrder = target.SortOrder;
+            target.SortOrder = tempOrder;
+
+            _productCategoryRepository.Update(source);
+            _productCategoryRepository.Update(target);
         }
 
         public void Save()
@@ -101,12 +107,23 @@ namespace TeduCoreApp.Application.Implementation
 
         public void Update(ProductCategoryViewModel productCategoryVm)
         {
-            throw new NotImplementedException();
+            var productCategory = Mapper.Map<ProductCategoryViewModel, ProductCategory>(productCategoryVm);
+            _productCategoryRepository.Update(productCategory);
         }
 
         public void UpdateParentId(int sourceId, int targetId, Dictionary<int, int> items)
         {
-            throw new NotImplementedException();
+            var sourceCategory = _productCategoryRepository.FindById(sourceId);
+            sourceCategory.ParentId = targetId;
+            _productCategoryRepository.Update(sourceCategory);
+
+            //Get all sibling
+            var sibling = _productCategoryRepository.FindAll(x => items.ContainsKey(x.Id));
+            foreach(var child in sibling)
+            {
+                child.SortOrder = items[child.Id];
+                _productCategoryRepository.Update(child);
+            }
         }
     }
 }

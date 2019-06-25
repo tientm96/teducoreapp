@@ -18,16 +18,24 @@ using TeduCoreApp.Application.Interfaces;
 using TeduCoreApp.Data.EF.Repositories;
 using TeduCoreApp.Data.IRepositories;
 using TeduCoreApp.Application.Implementation;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
+using TeduCoreApp.Helpers;
+using TeduCoreApp.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using TeduCoreApp.Authorization;
+using PaulMiami.AspNetCore.Mvc.Recaptcha;
+using TeduCoreApp.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using TeduCoreApp.Application.Dapper.Interfaces;
+using TeduCoreApp.Application.Dapper.Implementation;
+using Microsoft.AspNetCore.Mvc.Razor;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 
 namespace TeduCoreApp
 {
-    /*Cấu hình file statup, thay thế ApplicationDbContext mặc định thành AppDbContext của ta.
-        Mục đích cấu hình để gen ra db đúng với custom của ta.
-
-        -Sau khi cấu hình xong thì ta xóa folder Data (trong pr MVC) đc gen mặc định từ trước, với
-        ApplicationDbContext.
-     */
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -40,26 +48,26 @@ namespace TeduCoreApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //thay vì dùng ApplicationDbContext tạo sẵn, ta dùng AppDbContext tự custom
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 o => o.MigrationsAssembly("TeduCoreApp.Data.EF")));
-            //"DefaultConnection" lấy trong file appsetting.json, đã đc sửa lại.
-            //add object o.MigrationsAssembly để tự động DbContext trong Assembly đấy.
 
-            //cấu hình lại Identity
             services.AddIdentity<AppUser, AppRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Configure Identity: CẤU HÌNH USER, PASS CHO IDENTITY
+            services.AddMemoryCache();
+
+            services.AddMinResponse();
+
+            // Configure Identity
             services.Configure<IdentityOptions>(options =>
             {
-                // Password settings //cấu hình cho password
+                // Password settings
                 options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 6; //pass: cho phép độ dài 6
-                options.Password.RequireNonAlphanumeric = false; //ko yêu cầu ký tự đặc biệt
-                options.Password.RequireUppercase = false; //lp yêu cầu hoa thường
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
 
                 // Lockout settings
@@ -70,46 +78,132 @@ namespace TeduCoreApp
                 options.User.RequireUniqueEmail = true;
             });
 
-            //để sd đc dòng này cần add nuget: AutoMapper.Extensions.Microsoft.DependencyInjection
-            services.AddAutoMapper(); 
+            services.AddRecaptcha(new RecaptchaOptions()
+            {
+                SiteKey = Configuration["Recaptcha:SiteKey"],
+                SecretKey = Configuration["Recaptcha:SecretKey"]
+            });
 
-
-            // Add application services.***
-            
-            //Nếu muốn tạo đc dữ liệu User và Role mẫu ở DbInitializer thì phải cấu hình ở đây.
-            //Dùng AddScoped để giới hạn 1 request
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
+            });
+            services.AddImageResizer();
+            services.AddAutoMapper();
+            services.AddAuthentication()
+                .AddFacebook(facebookOpts =>
+                {
+                    facebookOpts.AppId = Configuration["Authentication:Facebook:AppId"];
+                    facebookOpts.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                })
+                .AddGoogle(googleOpts=> {
+                    googleOpts.ClientId = Configuration["Authentication:Google:ClientId"];
+                    googleOpts.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                });
+            // Add application services.
             services.AddScoped<UserManager<AppUser>, UserManager<AppUser>>();
             services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
 
-            //Cấu hình cho AUTOMAPPER (Nhớ NuGet AutoMapper ở pr này trước khi cấu hình)
             services.AddSingleton(Mapper.Configuration);
             services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
 
-
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IViewRenderService, ViewRenderService>();
 
-            /*Class DbInitializer dùng để khởi tạo một số dlieu để làm việc khi khởi tạo db.
-             * Chúng ta cấu hình class này tại đây.
-             *
-             *  Ta sẽ gọi nó (DbInitializer) dưới cùng của method Configure() ở dưới, bằng
-             *  cách đưa nó vào tham số của Configure()
-             */
-            //Add DbInitializer services
             services.AddTransient<DbInitializer>();
 
+            services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, CustomClaimsPrincipalFactory>();
 
-            //Phần ProductCategoryService trong pr Application muốn tự động chạy thì phải
-            //  cấu hình trong file starup của pr MVC
+            services.AddMvc(options =>
+            {
+                options.CacheProfiles.Add("Default",
+                    new CacheProfile()
+                    {
+                        Duration = 60
+                    });
+                options.CacheProfiles.Add("Never",
+                    new CacheProfile()
+                    {
+                        Location = ResponseCacheLocation.None,
+                        NoStore = true
+                    });
+            }).AddViewLocalization(
+                    LanguageViewLocationExpanderFormat.Suffix,
+                    opts => { opts.ResourcesPath = "Resources"; })
+                .AddDataAnnotationsLocalization()
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
+            services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
+
+            services.Configure<RequestLocalizationOptions>(
+              opts =>
+              {
+                  var supportedCultures = new List<CultureInfo>
+                  {
+                        new CultureInfo("en-US"),
+                        new CultureInfo("vi-VN")
+                  };
+
+                  opts.DefaultRequestCulture = new RequestCulture("en-US");
+                   // Formatting numbers, dates, etc.
+                   opts.SupportedCultures = supportedCultures;
+                   // UI strings that we have localized.
+                   opts.SupportedUICultures = supportedCultures;
+              });
+
+            services.AddTransient(typeof(IUnitOfWork), typeof(EFUnitOfWork));
+            services.AddTransient(typeof(IRepository<,>), typeof(EFRepository<,>));
+
+            //Repositories
             services.AddTransient<IProductCategoryRepository, ProductCategoryRepository>();
+            services.AddTransient<IFunctionRepository, FunctionRepository>();
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<ITagRepository, TagRepository>();
+            services.AddTransient<IProductTagRepository, ProductTagRepository>();
+            services.AddTransient<IPermissionRepository, PermissionRepository>();
+            services.AddTransient<IBillRepository, BillRepository>();
+            services.AddTransient<IBillDetailRepository, BillDetailRepository>();
+            services.AddTransient<IColorRepository, ColorRepository>();
+            services.AddTransient<ISizeRepository, SizeRepository>();
+            services.AddTransient<IProductQuantityRepository, ProductQuantityRepository>();
+            services.AddTransient<IProductImageRepository, ProductImageRepository>();
+            services.AddTransient<IWholePriceRepository, WholePriceRepository>();
+            services.AddTransient<IFeedbackRepository, FeedbackRepository>();
+            services.AddTransient<IContactRepository, ContactRepository>();
+            services.AddTransient<IBlogRepository, BlogRepository>();
+            services.AddTransient<IPageRepository, PageRepository>();
+
+            services.AddTransient<IBlogTagRepository, BlogTagRepository>();
+            services.AddTransient<ISlideRepository, SlideRepository>();
+            services.AddTransient<ISystemConfigRepository, SystemConfigRepository>();
+
+            services.AddTransient<IFooterRepository, FooterRepository>();
+
+
+            //Serrvices
             services.AddTransient<IProductCategoryService, ProductCategoryService>();
+            services.AddTransient<IFunctionService, FunctionService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IRoleService, RoleService>();
+            services.AddTransient<IBillService, BillService>();
+            services.AddTransient<IBlogService, BlogService>();
+            services.AddTransient<ICommonService, CommonService>();
+            services.AddTransient<IFeedbackService, FeedbackService>();
+            services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IReportService, ReportService>();
+
+            services.AddTransient<IAuthorizationHandler, BaseResourceAuthorizationHandler>();
 
 
-            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddFile("Logs/tedu-{Date}.txt");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -120,10 +214,14 @@ namespace TeduCoreApp
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseImageResizer();
             app.UseStaticFiles();
+            app.UseMinResponse();
+            app.UseAuthentication();
+            app.UseSession();
 
-            app.UseAuthentication();//bật Authen để sử dụng Identity
+            var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
 
             app.UseMvc(routes =>
             {
@@ -131,28 +229,12 @@ namespace TeduCoreApp
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
-                //Vì tự cấu hình Area nên phải qua starup này cấu hình 
-                //  đường dẫn MẶC ĐỊNH cho area
-                routes.MapRoute(
-                    name: "areaRoute",
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-                //area: tên area đó  |  contrll mđ là Home  | Act mđ Index  | id dấu ? =  null Able.
+                routes.MapRoute(name: "areaRoute",
+                    template: "{area:exists}/{controller=Login}/{action=Index}/{id?}");
+
+
             });
-
-
-            //gọi đến hàm Seed() để tạo dữ liệu
-            //dbInitializer.Seed().Wait();    //.Wait() gọi theo bất đồng bộ, nghĩa là đợi
-            //vì bên method dbInitializer.Seed() cấu hình theo bất đồng bộ.
-            //   Nghĩa là ĐỢI cho Task complete mới thực thi.
 
         }
     }
 }
-
-
-//NHỚ:
-/*- Sửa ApplicationUser thành AppUser cho phù hợp với Identity đã custom
-
-+ find trong file startup(MVC): chọn crrent Project và file All thì 
-sẽ tìm ra 1 danh sách chứa nó. Dùng Ctrl+H để thay thế nhanh.
- */

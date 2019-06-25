@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.Extensions.DependencyInjection;
 using TeduCoreApp.Data.EF;
 
 namespace TeduCoreApp
@@ -11,14 +16,13 @@ namespace TeduCoreApp
     {
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
-            using (var scope = host.Services.CreateScope())
+            var host =  BuildWebHost(args);
+            using(var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
 
                 try
                 {
-                    //lấy ra cái nào đã đc cấu hình trong startup.
                     var dbInitializer = services.GetService<DbInitializer>();
                     dbInitializer.Seed().Wait();
                 }

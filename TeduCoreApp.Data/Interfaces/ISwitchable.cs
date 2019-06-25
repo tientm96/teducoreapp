@@ -9,5 +9,4 @@ namespace TeduCoreApp.Data.Interfaces
     {
         Status Status { set; get; }
     }
-
 }

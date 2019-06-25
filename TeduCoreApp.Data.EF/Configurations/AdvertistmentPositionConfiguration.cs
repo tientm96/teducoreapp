@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +11,7 @@ namespace TeduCoreApp.Data.EF.Configurations
     {
         public override void Configure(EntityTypeBuilder<AdvertistmentPosition> entity)
         {
-            entity.Property(c => c.Id).HasMaxLength(20).IsRequired().HasColumnType("varchar(20)");
+            entity.Property(c => c.Id).HasMaxLength(20).IsRequired();
             // etc.
         }
     }

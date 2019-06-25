@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 using TeduCoreApp.Infrastructure.SharedKernel;
 
 namespace TeduCoreApp.Data.Entities
@@ -8,6 +10,7 @@ namespace TeduCoreApp.Data.Entities
     [Table("Colors")]
     public class Color : DomainEntity<int>
     {
+
         [StringLength(250)]
         public string Name
         {
@@ -16,11 +19,5 @@ namespace TeduCoreApp.Data.Entities
 
         [StringLength(250)]
         public string Code { get; set; }
-
-        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class BillDetail
-        public virtual ICollection<BillDetail> BillDetails { set; get; }
-
-        //Xác  nhận khóa ngoại tham chiếu từ lớp này đến class ProductQuantity
-        public virtual ICollection<ProductQuantity> ProductQuantitys { set; get; }
     }
 }

@@ -12,20 +12,12 @@ namespace TeduCoreApp.Data.Entities
     {
         public int BlogId { set; get; }
 
-        [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
+
         public string TagId { set; get; }
 
-
-        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Blog,
-        //  nên phải qua Blog xác nhận là có tham chiếu.
         [ForeignKey("BlogId")]
         public virtual Blog Blog { set; get; }
 
-
-        
-        //tạo khóa ngoại: foreignkey này đc tham chiếu từ class Tag,
-        //  nên phải qua Tag xác nhận là có tham chiếu.
         [ForeignKey("TagId")]
         public virtual Tag Tag { set; get; }
     }
